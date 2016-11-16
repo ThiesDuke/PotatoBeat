@@ -10,7 +10,7 @@ KidRockPin = 5
 Gpin   = 26
 Rpin   = 23
 BackGroundMusicArrayCount = 0
-touches = [0,0,0,0,0,0,0,0];
+touches = [0,0,0,0,0,0,0,0,0];
 
 snare = None
 kick = None
@@ -61,6 +61,13 @@ def KidRock():
 		#LED change
 		GPIO.output(Rpin, 0)
 		GPIO.output(Gpin, 1)
+		#update display
+		LCD1602.clear()
+		LCD1602.write(0, 0, 'Kid-Mode!')
+		showtitle = BackGroundMusicArray[0]
+		indexofslash = showtitle.rfind("/")+1
+		showtitle = showtitle[indexofslash:]
+		LCD1602.write(1, 0,showtitle)
 		#load background music in an array to skip through
 		BackGroundMusicArray = []
 		for filename in os.listdir("samples_music/kid/"):
@@ -77,18 +84,17 @@ def KidRock():
 		openhh = pygame.mixer.Sound("samples_music/kid_drums/clave.ogg")
 		tom1 = pygame.mixer.Sound("samples_music/kid_drums/tamborine.ogg")
 		tom2 = pygame.mixer.Sound("samples_music/kid_drums/triangle.ogg")
-		#update display
-		LCD1602.clear()
-		LCD1602.write(0, 0, 'Kid-Mode!')
-		showtitle = BackGroundMusicArray[0]
-		indexofslash = showtitle.rfind("/")+1
-		showtitle = showtitle[indexofslash:]
-		LCD1602.write(1, 1,showtitle)
 		KidRockVar = 1
 	else:
 		#LED change
 		GPIO.output(Rpin, 1)
 		GPIO.output(Gpin, 0)
+		LCD1602.clear()
+		LCD1602.write(0, 0, 'Rock-Mode!')
+		showtitle = BackGroundMusicArray[0]
+		indexofslash = showtitle.rfind("/")+1
+		showtitle = showtitle[indexofslash:]
+		LCD1602.write(1, 0,showtitle)
 		#load background music in an array to skip through
 		BackGroundMusicArray = []
 		for filename in os.listdir("samples_music/drumless_songs/"):
@@ -105,12 +111,6 @@ def KidRock():
 		openhh = pygame.mixer.Sound("samples_music/drums/openhat-acoustic01.ogg")
 		tom1 = pygame.mixer.Sound("samples_music/drums/tom-acoustic01.ogg")
 		tom2 = pygame.mixer.Sound("samples_music/drums/tom-acoustic02.ogg")
-		LCD1602.clear()
-		LCD1602.write(0, 0, 'Rock-Mode!')
-		showtitle = BackGroundMusicArray[0]
-		indexofslash = showtitle.rfind("/")+1
-		showtitle = showtitle[indexofslash:]
-		LCD1602.write(1, 1,showtitle)
 		KidRockVar = 0
      
 def detect(chn):
@@ -130,7 +130,7 @@ def nextSong():
 		BackGroundMusicArrayCount = 0
 		pygame.mixer.music.load(BackGroundMusicArray[BackGroundMusicArrayCount])
 		pygame.mixer.music.play(0)
-	LCD1602.write(1, 1, "                ")
+	LCD1602.write(1, 0, "                ")
 	showtitle = BackGroundMusicArray[BackGroundMusicArrayCount]
 	indexofslash = showtitle.rfind("/")+1
 	showtitle = showtitle[indexofslash:]
@@ -149,11 +149,11 @@ def previousSong():
 		BackGroundMusicArrayCount = len(BackGroundMusicArray)-1
 		pygame.mixer.music.load(BackGroundMusicArray[BackGroundMusicArrayCount])
 		pygame.mixer.music.play(0)
-	LCD1602.write(1, 1, "               ")
+	LCD1602.write(1, 0, "               ")
 	showtitle = BackGroundMusicArray[BackGroundMusicArrayCount]
 	indexofslash = showtitle.rfind("/")+1
 	showtitle = showtitle[indexofslash:]
-	LCD1602.write(1, 1,showtitle)
+	LCD1602.write(1, 0,showtitle)
 
 
 
@@ -165,7 +165,7 @@ def run():
 			pass
 		else: # Interupt pin is low
 			touchData = mpr121.readData(0x5a)
-			for i in range(8):
+			for i in range(9):
 				if (touchData & (1<<i)):
 					if (touches[i] == 0):
 							#print( 'Pin ' + str(i) + ' was just touched')
@@ -204,7 +204,7 @@ def destroy():
 	GPIO.cleanup()                     # Release resource
 	LCD1602.clear()
 	LCD1602.write(0,0,"Good bye,")
-	LCD1602.write(1,1,"Niklas")
+	LCD1602.write(1,0,"Niklas")
 
 if __name__ == '__main__':     # Program start from here
 	setup()
