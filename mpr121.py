@@ -3,7 +3,7 @@
 # And Scott Garner's conversion to Python
 # https://github.com/scottgarner/BeetBox
 # And helpful examples from Adafruit
-
+import pygame
 import time, threading
 import RPi.GPIO as GPIO
 import smbus
@@ -137,5 +137,3 @@ def setup(address):
 	# Set ELE_CFG to 0x00 to return to standby mode
 
 	bus.write_byte_data(address, ELE_CFG, 0x0C)  # Enables all 12 Electrodes
-
-       
