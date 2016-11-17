@@ -2,7 +2,7 @@
 import RPi.GPIO as GPIO
 import pygame
 import time
-import mpr121
+import mpr121_2 as mpr121
 import os
 import LCD1602
 
@@ -10,7 +10,7 @@ KidRockPin = 5
 Gpin   = 26
 Rpin   = 23
 BackGroundMusicArrayCount = 0
-touches = [0,0,0,0,0,0,0,0,0];
+touches = [0,0,0,0,0,0,0,0,0,0,0,0];
 
 snare = None
 kick = None
@@ -37,8 +37,8 @@ def setup():
 	pygame.mixer.init()
 	pygame.mixer.music.set_volume(0.99)  
 	# Initialize MPR121 here
-	mpr121.TOU_THRESH = 0x30
-	mpr121.REL_THRESH = 0x33
+	mpr121.TOU_THRESH = 10
+	mpr121.REL_THRESH = 20
 	mpr121.setup(0x5a)
 	# Initialize LCD Display
 	LCD1602.init(0x27, 1)
@@ -61,22 +61,23 @@ def KidRock():
 		#LED change
 		GPIO.output(Rpin, 0)
 		GPIO.output(Gpin, 1)
+		#load background music in an array to skip through
+		BackGroundMusicArray = []
+		for filename in sorted(os.listdir("samples_music/kid/")):
+			BackGroundMusicArray.append("samples_music/kid/"+ filename) # 123 im Sauseschritt laden!
+		BackGroundMusicArrayCount = 0
+		pygame.mixer.music.load(BackGroundMusicArray[BackGroundMusicArrayCount])
+		pygame.mixer.music.set_volume(0.7)
+		pygame.mixer.music.play(0)
+		print(BackGroundMusicArrayCount)
+		print(len(BackGroundMusicArray))
 		#update display
 		LCD1602.clear()
 		LCD1602.write(0, 0, 'Kid-Mode!')
 		showtitle = BackGroundMusicArray[0]
 		indexofslash = showtitle.rfind("/")+1
 		showtitle = showtitle[indexofslash:]
-		LCD1602.write(1, 0,showtitle)
-		#load background music in an array to skip through
-		BackGroundMusicArray = []
-		for filename in os.listdir("samples_music/kid/"):
-			BackGroundMusicArray.append("samples_music/kid/"+ filename) # 123 im Sauseschritt laden!
-		BackGroundMusicArrayCount = 0
-		pygame.mixer.music.load(BackGroundMusicArray[BackGroundMusicArrayCount])
-		pygame.mixer.music.play(0)
-		print(BackGroundMusicArrayCount)
-		print(len(BackGroundMusicArray))
+		LCD1602.write(0, 1,showtitle)
 		#drum sounds are loaded
 		kick = pygame.mixer.Sound("samples_music/kid_drums/bongo1.ogg")
 		snare = pygame.mixer.Sound("samples_music/kid_drums/bongo2.ogg")
@@ -89,23 +90,24 @@ def KidRock():
 		#LED change
 		GPIO.output(Rpin, 1)
 		GPIO.output(Gpin, 0)
+		#load background music in an array to skip through
+		BackGroundMusicArray = []
+		for filename in sorted(os.listdir("samples_music/drumless_songs/")):
+			BackGroundMusicArray.append("samples_music/drumless_songs/"+ filename)
+		BackGroundMusicArrayCount = 0
+		pygame.mixer.music.load(BackGroundMusicArray[BackGroundMusicArrayCount])
+		pygame.mixer.music.set_volume(0.7)
+		pygame.mixer.music.play(0)
+		print(BackGroundMusicArrayCount)
+		print(len(BackGroundMusicArray))
 		LCD1602.clear()
 		LCD1602.write(0, 0, 'Rock-Mode!')
 		showtitle = BackGroundMusicArray[0]
 		indexofslash = showtitle.rfind("/")+1
 		showtitle = showtitle[indexofslash:]
-		LCD1602.write(1, 0,showtitle)
-		#load background music in an array to skip through
-		BackGroundMusicArray = []
-		for filename in os.listdir("samples_music/drumless_songs/"):
-			BackGroundMusicArray.append("samples_music/drumless_songs/"+ filename)
-		BackGroundMusicArrayCount = 0
-		pygame.mixer.music.load(BackGroundMusicArray[BackGroundMusicArrayCount])
-		pygame.mixer.music.play(0)
-		print(BackGroundMusicArrayCount)
-		print(len(BackGroundMusicArray))
+		LCD1602.write(0, 1,showtitle)
 		#drum sounds are loaded
-		kick = pygame.mixer.Sound("samples_music/drums/kick-oldschool.ogg")
+		kick = pygame.mixer.Sound("samples_music/drums/acoustic-kick.ogg")
 		snare = pygame.mixer.Sound("samples_music/drums/snare-acoustic02.ogg")
 		closedhh = pygame.mixer.Sound("samples_music/drums/hihat-acoustic02.ogg")
 		openhh = pygame.mixer.Sound("samples_music/drums/openhat-acoustic01.ogg")
@@ -204,7 +206,7 @@ def destroy():
 	GPIO.cleanup()                     # Release resource
 	LCD1602.clear()
 	LCD1602.write(0,0,"Good bye,")
-	LCD1602.write(1,0,"Niklas")
+	LCD1602.write(0,1,"Niklas")
 
 if __name__ == '__main__':     # Program start from here
 	setup()
