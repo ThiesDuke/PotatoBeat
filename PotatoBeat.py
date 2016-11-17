@@ -37,8 +37,8 @@ def setup():
 	pygame.mixer.init()
 	pygame.mixer.music.set_volume(0.99)  
 	# Initialize MPR121 here
-	mpr121.TOU_THRESH = 10
-	mpr121.REL_THRESH = 20
+	mpr121.TOU_THRESH = 0x30
+	mpr121.REL_THRESH = 0x33
 	mpr121.setup(0x5a)
 	# Initialize LCD Display
 	LCD1602.init(0x27, 1)
