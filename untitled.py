@@ -3,7 +3,7 @@
 # And Scott Garner's conversion to Python
 # https://github.com/scottgarner/BeetBox
 # And helpful examples from Adafruit
-import pygame
+
 import time, threading
 import RPi.GPIO as GPIO
 import smbus
@@ -136,61 +136,4 @@ def setup(address):
 	# Electrode Configuration
 	# Set ELE_CFG to 0x00 to return to standby mode
 
-	bus.write_byte_data(address, ELE_CFG, 0x0C)  # Enables all 12 Electrodes	
-
-#---- main -----#
-TOU_THRESH = 10
-REL_THRESH = 20
-setup(0x5a)
-last_touched = readData(0x5a)
-
-# Use pygame for sounds
-pygame.mixer.pre_init(44100, -16, 12, 512)
-pygame.init()
-pygame.mixer.music.set_volume(1.0)
-
-soundsList = [
-  '/opt/sonic-pi/etc/samples/drum_tom_hi_hard.wav',
-  '/opt/sonic-pi/etc/samples/sn_dolf.wav',
-  '/opt/sonic-pi/etc/samples/drum_tom_mid_hard.wav',
-  '/opt/sonic-pi/etc/samples/drum_snare_hard.wav',
-  '/opt/sonic-pi/etc/samples/drum_cymbal_open.wav',
-  '/opt/sonic-pi/etc/samples/bass_voxy_c.wav',
-  '/opt/sonic-pi/etc/samples/elec_bong.wav',
-  '/opt/sonic-pi/etc/samples/bass_voxy_hit_c.wav',
-  '/opt/sonic-pi/etc/samples/ambi_choir.wav',
-  '/opt/sonic-pi/etc/samples/drum_cymbal_hard.wav',
-  '/opt/sonic-pi/etc/samples/drum_splash_hard.wav',
-  '/opt/sonic-pi/etc/samples/loop_amen_full.wav'
-]
-
-sounds = [0,0,0,0,0,0,0,0,0,0,0,0]
-key = 0
-for  sound in soundsList:
-  sounds[key] = pygame.mixer.Sound(sound)
-  sounds[key].set_volume(1)
-  key += 1
-
-print "Press Ctrl C to end"
-
-lastTap = 0
-
-while True:
-  currentTap = readData(0x5a)
-  for i in range(12):
-    pin_bit = 1 << i
-    if currentTap & pin_bit and not lastTap & pin_bit:
-      print "Touched: " + str(i)
-      t = threading.Thread(target=playSound, args=(i,))
-      t.start()      
-    if not currentTap & pin_bit and lastTap & pin_bit:
-      print "Released: " + str(i)
-  lastTap = currentTap
-  time.sleep(0.1)
-
-  def playSound(i):
-    if (sounds[i]):
-      sounds[i].play()
-
-
-       
+	bus.write_byte_data(address, ELE_CFG, 0x0C)  # Enables all 12 Electrodes
