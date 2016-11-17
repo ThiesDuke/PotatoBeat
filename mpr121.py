@@ -1,15 +1,11 @@
 # Based on Arduino example by Jim Lindblom
 # http://bildr.org/2011/05/mpr121_arduino/
-# And Scott Garner's conversion to Python
-# https://github.com/scottgarner/BeetBox
-# And helpful examples from Adafruit
 
-import time, threading
-import RPi.GPIO as GPIO
 import smbus
-bus = smbus.SMBus(1) # Pi 2
+bus = smbus.SMBus(0) #0 pour ancien modele de RPI et 1 pour rev2
 
 # MPR121 Register Defines
+
 MHD_R = 0x2B
 NHD_R = 0x2C
 NCL_R = 0x2D
@@ -59,83 +55,83 @@ ATO_CFGT = 0x7F
 
 # Global Constants
 
-TOU_THRESH = 06
-REL_THRESH = 12
+TOU_THRESH = 0x06
+REL_THRESH = 0x0A
 
 # Routines
 
 def readData(address):
-#	MSB = bus.read_byte_data(address, 0x00)
-#	LSB = bus.read_byte_data(address, 0x01)
-	touchData = bus.read_word_data(address, 0x01)
-	return touchData
+    #MSB = bus.read_byte_data(address, 0x00)
+    #LSB = bus.read_byte_data(address, 0x01)
+
+    touchData = bus.read_word_data(address, 0x01) # read world instead byte (too short)
+
+    return touchData;
 
 def setup(address):
 
-	bus.write_byte_data(address, ELE_CFG, 0x00)
+   bus.write_byte_data(address, ELE_CFG, 0x00)
 
-	# Section A - Controls filtering when data is > baseline.
-	 
-	bus.write_byte_data(address, MHD_R, 0x01)
-	bus.write_byte_data(address, NHD_R, 0x01)
-	bus.write_byte_data(address, NCL_R, 0x00)
-	bus.write_byte_data(address, FDL_R, 0x00)
+   # Section A - Controls filtering when data is > baseline.
+    
+   bus.write_byte_data(address, MHD_R, 0x01)
+   bus.write_byte_data(address, NHD_R, 0x01)
+   bus.write_byte_data(address, NCL_R, 0x00)
+   bus.write_byte_data(address, FDL_R, 0x00)
 
-	# Section B - Controls filtering when data is < baseline.
+   # Section B - Controls filtering when data is < baseline.
 
-	bus.write_byte_data(address, MHD_F, 0x01)
-	bus.write_byte_data(address, NHD_F, 0x01)
-	bus.write_byte_data(address, NCL_F, 0xFF)
-	bus.write_byte_data(address, FDL_F, 0x02)	
+   bus.write_byte_data(address, MHD_F, 0x01)
+   bus.write_byte_data(address, NHD_F, 0x01)
+   bus.write_byte_data(address, NCL_F, 0xFF)
+   bus.write_byte_data(address, FDL_F, 0x02)   
 
-	#Section C - Sets touch and release thresholds for each electrode
+   #Section C - Sets touch and release thresholds for each electrode
 
-	bus.write_byte_data(address, ELE0_T, TOU_THRESH)
-	bus.write_byte_data(address, ELE0_R, REL_THRESH)
+   bus.write_byte_data(address, ELE0_T, TOU_THRESH)
+   bus.write_byte_data(address, ELE0_R, REL_THRESH)
 
-	bus.write_byte_data(address, ELE1_T, TOU_THRESH)
-	bus.write_byte_data(address, ELE1_R, REL_THRESH)
+   bus.write_byte_data(address, ELE1_T, TOU_THRESH)
+   bus.write_byte_data(address, ELE1_R, REL_THRESH)
 
-	bus.write_byte_data(address, ELE2_T, TOU_THRESH)
-	bus.write_byte_data(address, ELE2_R, REL_THRESH)
+   bus.write_byte_data(address, ELE2_T, TOU_THRESH)
+   bus.write_byte_data(address, ELE2_R, REL_THRESH)
 
-	bus.write_byte_data(address, ELE3_T, TOU_THRESH)
-	bus.write_byte_data(address, ELE3_R, REL_THRESH)
+   bus.write_byte_data(address, ELE3_T, TOU_THRESH)
+   bus.write_byte_data(address, ELE3_R, REL_THRESH)
 
-	bus.write_byte_data(address, ELE4_T, TOU_THRESH)
-	bus.write_byte_data(address, ELE4_R, REL_THRESH)
+   bus.write_byte_data(address, ELE4_T, TOU_THRESH)
+   bus.write_byte_data(address, ELE4_R, REL_THRESH)
 
-	bus.write_byte_data(address, ELE5_T, TOU_THRESH)
-	bus.write_byte_data(address, ELE5_R, REL_THRESH)
+   bus.write_byte_data(address, ELE5_T, TOU_THRESH)
+   bus.write_byte_data(address, ELE5_R, REL_THRESH)
 
-	bus.write_byte_data(address, ELE6_T, TOU_THRESH)
-	bus.write_byte_data(address, ELE6_R, REL_THRESH)
+   bus.write_byte_data(address, ELE6_T, TOU_THRESH)
+   bus.write_byte_data(address, ELE6_R, REL_THRESH)
 
-	bus.write_byte_data(address, ELE7_T, TOU_THRESH)
-	bus.write_byte_data(address, ELE7_R, REL_THRESH)
+   bus.write_byte_data(address, ELE7_T, TOU_THRESH)
+   bus.write_byte_data(address, ELE7_R, REL_THRESH)
 
-	bus.write_byte_data(address, ELE8_T, TOU_THRESH)
-	bus.write_byte_data(address, ELE8_R, REL_THRESH)
+   bus.write_byte_data(address, ELE8_T, TOU_THRESH)
+   bus.write_byte_data(address, ELE8_R, REL_THRESH)
 
-	bus.write_byte_data(address, ELE9_T, TOU_THRESH)
-	bus.write_byte_data(address, ELE9_R, REL_THRESH)
+   bus.write_byte_data(address, ELE9_T, TOU_THRESH)
+   bus.write_byte_data(address, ELE9_R, REL_THRESH)
 
-	bus.write_byte_data(address, ELE10_T, TOU_THRESH)
-	bus.write_byte_data(address, ELE10_R, REL_THRESH)
+   bus.write_byte_data(address, ELE10_T, TOU_THRESH)
+   bus.write_byte_data(address, ELE10_R, REL_THRESH)
 
-	bus.write_byte_data(address, ELE11_T, TOU_THRESH)
-	bus.write_byte_data(address, ELE11_R, REL_THRESH)	
+   bus.write_byte_data(address, ELE11_T, TOU_THRESH)
+   bus.write_byte_data(address, ELE11_R, REL_THRESH)   
 
-	# Section D
-	# Set the Filter Configuration
-	# Set ESI2
+   # Section D
+   # Set the Filter Configuration
+   # Set ESI2
 
-	bus.write_byte_data(address, FIL_CFG, 0x04)
+   bus.write_byte_data(address, FIL_CFG, 0x04)
 
-	# Section E
-	# Electrode Configuration
-	# Set ELE_CFG to 0x00 to return to standby mode
+   # Section E
+   # Electrode Configuration
+   # Set ELE_CFG to 0x00 to return to standby mode
 
-	bus.write_byte_data(address, ELE_CFG, 0x0C)  # Enables all 12 Electrodes
-
-       
+   bus.write_byte_data(address, ELE_CFG, 0x0C)  # Enables all 12 Electrodes   
