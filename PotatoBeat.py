@@ -2,9 +2,10 @@
 import RPi.GPIO as GPIO
 import pygame
 import time
-import mpr121_2 as mpr121
+import mpr121
 import os
 import LCD1602
+from  itertools import cycle
 
 KidRockPin = 5
 Gpin   = 26
@@ -22,7 +23,9 @@ BackGroundMusic = None
 BackGroundMusicArray = []
 BackGroundMusicArrayCount = 0
 KidRockVar = 0
-MusicPaused = 0
+MusicPaused = 1
+IterFunc = cycle([0,1]).next
+PauseFunc = cycle([0,1,2]).next
 
 def setup():
 	# PIN Setup
@@ -56,6 +59,7 @@ def KidRock():
 	global BackGroundMusic
 	global BackGroundMusicArrayCount
 	global BackGroundMusicArray
+	KidRockVar = IterFunc()
 
 	if (KidRockVar == 0):
 		#LED change
@@ -63,58 +67,52 @@ def KidRock():
 		GPIO.output(Gpin, 1)
 		#load background music in an array to skip through
 		BackGroundMusicArray = []
-		for filename in sorted(os.listdir("samples_music/kid/")):
-			BackGroundMusicArray.append("samples_music/kid/"+ filename) # 123 im Sauseschritt laden!
+		for filename in sorted(os.listdir("/home/pi/beetbox/samples_music/kid/")):
+			BackGroundMusicArray.append("/home/pi/beetbox/samples_music/kid/"+ filename) # 123 im Sauseschritt laden!
 		BackGroundMusicArrayCount = 0
 		pygame.mixer.music.load(BackGroundMusicArray[BackGroundMusicArrayCount])
 		pygame.mixer.music.set_volume(0.7)
-		pygame.mixer.music.play(0)
-		print(BackGroundMusicArrayCount)
-		print(len(BackGroundMusicArray))
-		#update display
+		#drum sounds are loaded
+		kick = pygame.mixer.Sound("/home/pi/beetbox/samples_music/kid_drums/bongo1.ogg")
+		snare = pygame.mixer.Sound("/home/pi/beetbox/samples_music/kid_drums/bongo2.ogg")
+		closedhh = pygame.mixer.Sound("/home/pi/beetbox/samples_music/kid_drums/kick.ogg")
+		openhh = pygame.mixer.Sound("/home/pi/beetbox/samples_music/kid_drums/clave.ogg")
+		tom1 = pygame.mixer.Sound("/home/pi/beetbox/samples_music/kid_drums/tamborine.ogg")
+		tom2 = pygame.mixer.Sound("/home/pi/beetbox/samples_music/kid_drums/triangle.ogg")
 		LCD1602.clear()
 		LCD1602.write(0, 0, 'Kid-Mode!')
 		showtitle = BackGroundMusicArray[0]
 		indexofslash = showtitle.rfind("/")+1
 		showtitle = showtitle[indexofslash:]
 		LCD1602.write(0, 1,showtitle)
-		#drum sounds are loaded
-		kick = pygame.mixer.Sound("samples_music/kid_drums/bongo1.ogg")
-		snare = pygame.mixer.Sound("samples_music/kid_drums/bongo2.ogg")
-		closedhh = pygame.mixer.Sound("samples_music/kid_drums/kick.ogg")
-		openhh = pygame.mixer.Sound("samples_music/kid_drums/clave.ogg")
-		tom1 = pygame.mixer.Sound("samples_music/kid_drums/tamborine.ogg")
-		tom2 = pygame.mixer.Sound("samples_music/kid_drums/triangle.ogg")
-		KidRockVar = 1
 	else:
 		#LED change
 		GPIO.output(Rpin, 1)
 		GPIO.output(Gpin, 0)
 		#load background music in an array to skip through
 		BackGroundMusicArray = []
-		for filename in sorted(os.listdir("samples_music/drumless_songs/")):
-			BackGroundMusicArray.append("samples_music/drumless_songs/"+ filename)
+		for filename in sorted(os.listdir("/home/pi/beetbox/samples_music/drumless_songs/")):
+			BackGroundMusicArray.append("/home/pi/beetbox/samples_music/drumless_songs/"+ filename)
 		BackGroundMusicArrayCount = 0
 		pygame.mixer.music.load(BackGroundMusicArray[BackGroundMusicArrayCount])
 		pygame.mixer.music.set_volume(0.7)
-		pygame.mixer.music.play(0)
-		print(BackGroundMusicArrayCount)
+		#pygame.mixer.music.play(0)
+		#print(BackGroundMusicArrayCount)
 		print(len(BackGroundMusicArray))
-		LCD1602.clear()
+		#drum sounds are loaded
+		kick = pygame.mixer.Sound("/home/pi/beetbox/samples_music/drums/acoustic-kick.ogg")
+		snare = pygame.mixer.Sound("/home/pi/beetbox/samples_music/drums/snare-acoustic02.ogg")
+		closedhh = pygame.mixer.Sound("/home/pi/beetbox/samples_music/drums/hihat-acoustic02.ogg")
+		openhh = pygame.mixer.Sound("/home/pi/beetbox/samples_music/drums/openhat-acoustic01.ogg")
+		tom1 = pygame.mixer.Sound("/home/pi/beetbox/samples_music/drums/tom-acoustic01.ogg")
+		tom2 = pygame.mixer.Sound("/home/pi/beetbox/samples_music/drums/tom-acoustic02.ogg")
+     	LCD1602.clear()
 		LCD1602.write(0, 0, 'Rock-Mode!')
 		showtitle = BackGroundMusicArray[0]
 		indexofslash = showtitle.rfind("/")+1
 		showtitle = showtitle[indexofslash:]
 		LCD1602.write(0, 1,showtitle)
-		#drum sounds are loaded
-		kick = pygame.mixer.Sound("samples_music/drums/acoustic-kick.ogg")
-		snare = pygame.mixer.Sound("samples_music/drums/snare-acoustic02.ogg")
-		closedhh = pygame.mixer.Sound("samples_music/drums/hihat-acoustic02.ogg")
-		openhh = pygame.mixer.Sound("samples_music/drums/openhat-acoustic01.ogg")
-		tom1 = pygame.mixer.Sound("samples_music/drums/tom-acoustic01.ogg")
-		tom2 = pygame.mixer.Sound("samples_music/drums/tom-acoustic02.ogg")
-		KidRockVar = 0
-     
+
 def detect(chn):
 	pygame.mixer.music.stop()
 	KidRock()
@@ -127,11 +125,11 @@ def nextSong():
 	if (BackGroundMusicArrayCount != len(BackGroundMusicArray)):
 		BackGroundMusicArrayCount = BackGroundMusicArrayCount+1
 		pygame.mixer.music.load(BackGroundMusicArray[BackGroundMusicArrayCount])
-		pygame.mixer.music.play(0)
+		#pygame.mixer.music.play(0)
 	else:
 		BackGroundMusicArrayCount = 0
 		pygame.mixer.music.load(BackGroundMusicArray[BackGroundMusicArrayCount])
-		pygame.mixer.music.play(0)
+		#pygame.mixer.music.play(0)
 	LCD1602.write(1, 0, "                ")
 	showtitle = BackGroundMusicArray[BackGroundMusicArrayCount]
 	indexofslash = showtitle.rfind("/")+1
@@ -146,11 +144,11 @@ def previousSong():
 	if (BackGroundMusicArrayCount != 0):
 		BackGroundMusicArrayCount = BackGroundMusicArrayCount-1
 		pygame.mixer.music.load(BackGroundMusicArray[BackGroundMusicArrayCount])
-		pygame.mixer.music.play(0)
+		#pygame.mixer.music.play(0)
 	else:
 		BackGroundMusicArrayCount = len(BackGroundMusicArray)-1
 		pygame.mixer.music.load(BackGroundMusicArray[BackGroundMusicArrayCount])
-		pygame.mixer.music.play(0)
+		#pygame.mixer.music.play(0)
 	LCD1602.write(1, 0, "               ")
 	showtitle = BackGroundMusicArray[BackGroundMusicArrayCount]
 	indexofslash = showtitle.rfind("/")+1
@@ -186,19 +184,20 @@ def run():
 						elif i == 6:
 							previousSong()
 						elif i == 7:
+							MusicPaused = PauseFunc()
 							if (MusicPaused == 0):
+								pygame.mixer.music.play()
+							elif (MusicPaused == 1):
 								pygame.mixer.music.pause()
-								MusicPaused = 1
-							else:
+							elif (MusicPaused == 2):
 								pygame.mixer.music.unpause()
-								MusicPaused = 0
 						elif i == 8:
 							nextSong()
 					touches[i] = 1
 				else:
 					if (touches[i] == 1):
-						print( 'Pin ' + str(i) + ' was just released')
-					touches[i] = 0;
+						#print( 'Pin ' + str(i) + ' was just released')
+						touches[i] = 0;
 
 def destroy():
 	GPIO.output(Gpin, GPIO.HIGH)       # Green led off
