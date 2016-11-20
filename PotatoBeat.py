@@ -80,7 +80,7 @@ def KidRock():
 		tom1 = pygame.mixer.Sound("/home/pi/beetbox/samples_music/kid_drums/tamborine.ogg")
 		tom2 = pygame.mixer.Sound("/home/pi/beetbox/samples_music/kid_drums/triangle.ogg")
 		LCD1602.clear()
-		LCD1602.write(0, 0, 'Kid-Mode!')
+		LCD1602.write(0, 0, 'Kid-Mode Man!')
 		showtitle = BackGroundMusicArray[0]
 		indexofslash = showtitle.rfind("/")+1
 		showtitle = showtitle[indexofslash:]
