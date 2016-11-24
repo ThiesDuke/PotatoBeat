@@ -6,6 +6,7 @@ import mpr121
 import os
 import LCD1602
 from  itertools import cycle
+import talkey
 
 KidRockPin = 5
 Gpin   = 26
@@ -26,6 +27,11 @@ KidRockVar = 0
 MusicPaused = 1
 IterFunc = cycle([0,1]).next
 PauseFunc = cycle([0,1,2]).next
+tts = talkey.Talkey(
+	preferred_languages =['en'],
+	preferred_factor =80.0,
+	engine_preference = ['pico']
+	)
 
 def setup():
 	# PIN Setup
@@ -43,6 +49,7 @@ def setup():
 	mpr121.TOU_THRESH = 10
 	mpr121.REL_THRESH = 20
 	mpr121.setup(0x5a)
+	tts.say("Let's get this party started")
 	# Initialize LCD Display
 	LCD1602.init(0x27, 1)
 	LCD1602.clear()
@@ -66,12 +73,14 @@ def KidRock():
 		lcd_message = "Kid-Mode!"
 		GPIO.output(Rpin, 0)
 		GPIO.output(Gpin, 1)
+		talkey_message = "Kid Mode activated!"
 	else:		
 		GPIO.output(Rpin, 1)
 		GPIO.output(Gpin, 0)
 		filepath_music = "/home/pi/beetbox/samples_music/drumless_songs/"
 		filepath_drums = "/home/pi/beetbox/drums/"
 		lcd_message = "Rock-Mode!"
+		talkey_message = "Rock Mode activated!"
 	#load background music in an array to skip through
 	BackGroundMusicArray = []
 	DrumsArray = []
@@ -95,6 +104,7 @@ def KidRock():
 	indexofslash = showtitle.rfind("/")+1
 	showtitle = showtitle[indexofslash:]
 	LCD1602.write(0, 1,showtitle)
+	tts.say(talkey_message)
 
 def detect(chn):
 	pygame.mixer.music.stop()
