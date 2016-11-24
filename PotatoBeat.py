@@ -11,22 +11,19 @@ import talkey
 KidRockPin = 5
 Gpin   = 26
 Rpin   = 23
-BackGroundMusicArrayCount = 0
-touches = [0,0,0,0,0,0,0,0,0,0,0,0];
-
 snare = None
 kick = None
 closedhh = None
 openhh = None
 tom1 = None
 tom2 = None
-BackGroundMusic = None
 BackGroundMusicArray = []
 BackGroundMusicArrayCount = 0
 KidRockVar = 0
-MusicPaused = 1
 IterFunc = cycle([0,1]).next
 PauseFunc = cycle([0,1,2]).next
+
+touches = [0,0,0,0,0,0,0,0,0,0,0,0];
 tts = talkey.Talkey(
 	preferred_languages =['en'],
 	preferred_factor =80.0,
@@ -63,7 +60,6 @@ def KidRock():
 	global openhh
 	global tom1
 	global tom2
-	global BackGroundMusic
 	global BackGroundMusicArrayCount
 	global BackGroundMusicArray
 	KidRockVar = IterFunc()
@@ -111,7 +107,6 @@ def detect(chn):
 	KidRock()
 
 def nextSong():
-	global BackGroundMusic
 	global BackGroundMusicArrayCount
 	global BackGroundMusicArray
 	pygame.mixer.music.stop()
@@ -130,7 +125,6 @@ def nextSong():
 	LCD1602.write(0, 1,showtitle)
 
 def previousSong():
-	global BackGroundMusic
 	global BackGroundMusicArrayCount
 	global BackGroundMusicArray
 	pygame.mixer.music.stop()
@@ -149,8 +143,7 @@ def previousSong():
 	LCD1602.write(1, 0,showtitle)
 
 def run():
-	global BackGroundMusic
-	global MusicPaused
+	MusicPaused = 1
 	while True:
 		if (GPIO.input(6)): # Interupt pin is high
 			pass
