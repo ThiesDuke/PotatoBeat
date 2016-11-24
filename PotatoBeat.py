@@ -196,6 +196,7 @@ def destroy():
 	GPIO.output(Gpin, GPIO.HIGH)       # Green led off
 	GPIO.output(Rpin, GPIO.HIGH)       # Red led off
 	GPIO.cleanup()                     # Release resource
+	tts.say("see you next time, buddy!")
 	LCD1602.clear()
 	LCD1602.write(0,0,"Good bye,")
 	LCD1602.write(0,1,"Niklas")
