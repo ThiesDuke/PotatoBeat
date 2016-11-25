@@ -34,7 +34,7 @@ def setup():
 	#Pygame setup
 	pygame.mixer.pre_init(44100, -16, 2, 512)
 	pygame.mixer.init()
-	pygame.mixer.music.set_volume(0.7)  
+	pygame.mixer.music.set_volume(0.5)  
 	# Initialize MPR121 here
 	mpr121.TOU_THRESH = 10
 	mpr121.REL_THRESH = 20
@@ -57,8 +57,8 @@ def KidRock():
 	print("KidRock started")
 	KidRockVar = IterFunc()
 	if (KidRockVar == 0):
-		filepath_music = "/home/pi/beetbox/samples_music/kid/"
-		filepath_drums = "/home/pi/beetbox/kid_drums/"
+		filepath_music = "/home/pi/share/beetbox/samples_music/kid/"
+		filepath_drums = "/home/pi/share/beetbox/samples_music/kid_drums/"
 		lcd_message = "Kid-Mode!"
 		GPIO.output(Rpin, 0)
 		GPIO.output(Gpin, 1)
@@ -66,8 +66,8 @@ def KidRock():
 	else:		
 		GPIO.output(Rpin, 1)
 		GPIO.output(Gpin, 0)
-		filepath_music = "/home/pi/beetbox/samples_music/drumless_songs/"
-		filepath_drums = "/home/pi/beetbox/drums/"
+		filepath_music = "/home/pi/share/beetbox/samples_music/drumless_songs/"
+		filepath_drums = "/home/pi/share/beetbox/samples_music/drums/"
 		lcd_message = "Rock-Mode!"
 		status_message = "Rock Mode activated!"
 	#load background music in an array to skip through
@@ -83,7 +83,7 @@ def KidRock():
 	print(BackGroundMusicArray[BackGroundMusicArrayCount]+"loaded and paused")
 	#drum sounds are loaded
 	for filename_drums in sorted(os.listdir(filepath_drums)):
-		DrumsArray.append(filepath_music + filename_drums)
+		DrumsArray.append(filepath_drums + filename_drums)
 	kick = pygame.mixer.Sound(DrumsArray[0])
 	snare = pygame.mixer.Sound(DrumsArray[1])
 	closedhh = pygame.mixer.Sound(DrumsArray[2])
@@ -94,6 +94,7 @@ def KidRock():
 	showtitle = BackGroundMusicArray[0]
 	indexofslash = showtitle.rfind("/")+1
 	showtitle = showtitle[indexofslash:]
+	LCD1602.init(0x27, 1)
 	LCD1602.clear()
 	LCD1602.write(0, 0, lcd_message)
 	LCD1602.write(0, 1,showtitle)
@@ -121,6 +122,7 @@ def nextSong():
 		BackGroundMusicArrayCount = 0
 		pygame.mixer.music.load(BackGroundMusicArray[BackGroundMusicArrayCount])
 		#pygame.mixer.music.play(0)
+	LCD1602.init(0x27, 1)
 	LCD1602.clear()
 	showtitle = BackGroundMusicArray[BackGroundMusicArrayCount]
 	indexofslash = showtitle.rfind("/")+1
@@ -143,6 +145,7 @@ def previousSong():
 		BackGroundMusicArrayCount = len(BackGroundMusicArray)-1
 		pygame.mixer.music.load(BackGroundMusicArray[BackGroundMusicArrayCount])
 		#pygame.mixer.music.play(0)
+	LCD1602.init(0x27, 1)
 	LCD1602.clear()
 	showtitle = BackGroundMusicArray[BackGroundMusicArrayCount]
 	indexofslash = showtitle.rfind("/")+1
@@ -153,6 +156,12 @@ def previousSong():
 	print("Previous song loaded and paused")
 
 def run():
+	global kick
+	global snare
+	global openhh
+	global closedhh
+	global tom1
+	global tom2
 	while True:
 		if (GPIO.input(6)): # Interupt pin is high
 			pass
@@ -161,7 +170,7 @@ def run():
 			for i in range(9):
 				if (touchData & (1<<i)):
 					if (touches[i] == 0):
-							print( 'Pin ' + str(i) + ' was just touched')
+						 #print( 'Pin ' + str(i) + ' was just touched')
 						if (i == 0):
 							kick.play()
 						elif i == 1:
@@ -189,7 +198,7 @@ def run():
 					touches[i] = 1
 				else:
 					if (touches[i] == 1):
-						#print( 'Pin ' + str(i) + ' was just released')
+						print( 'Pin ' + str(i) + ' was just released')
 						touches[i] = 0;
 
 def destroy():
