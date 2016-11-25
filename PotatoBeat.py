@@ -6,7 +6,7 @@ import mpr121
 import os
 import LCD1602
 from  itertools import cycle
-import talkey
+
 
 KidRockPin = 5
 Gpin   = 26
@@ -21,14 +21,9 @@ BackGroundMusicArray = []
 BackGroundMusicArrayCount = 0
 KidRockVar = 0
 IterFunc = cycle([0,1]).next
-PauseFunc = cycle([0,1,2]).next
-
+PauseFunc = cycle([0,1]).next
 touches = [0,0,0,0,0,0,0,0,0,0,0,0];
-tts = talkey.Talkey(
-	preferred_languages =['en'],
-	preferred_factor =80.0,
-	engine_preference = ['pico']
-	)
+
 
 def setup():
 	# PIN Setup
@@ -41,12 +36,11 @@ def setup():
 	#Pygame setup
 	pygame.mixer.pre_init(44100, -16, 2, 512)
 	pygame.mixer.init()
-	pygame.mixer.music.set_volume(0.99)  
+	pygame.mixer.music.set_volume(0.7)  
 	# Initialize MPR121 here
 	mpr121.TOU_THRESH = 10
 	mpr121.REL_THRESH = 20
 	mpr121.setup(0x5a)
-	tts.say("Let's get this party started")
 	# Initialize LCD Display
 	LCD1602.init(0x27, 1)
 	LCD1602.clear()
@@ -62,6 +56,7 @@ def KidRock():
 	global tom2
 	global BackGroundMusicArrayCount
 	global BackGroundMusicArray
+	print("KidRock started")
 	KidRockVar = IterFunc()
 	if (KidRockVar == 0):
 		filepath_music = "/home/pi/beetbox/samples_music/kid/"
@@ -69,14 +64,14 @@ def KidRock():
 		lcd_message = "Kid-Mode!"
 		GPIO.output(Rpin, 0)
 		GPIO.output(Gpin, 1)
-		talkey_message = "Kid Mode activated!"
+		status_message = "Kid Mode activated!"
 	else:		
 		GPIO.output(Rpin, 1)
 		GPIO.output(Gpin, 0)
 		filepath_music = "/home/pi/beetbox/samples_music/drumless_songs/"
 		filepath_drums = "/home/pi/beetbox/drums/"
 		lcd_message = "Rock-Mode!"
-		talkey_message = "Rock Mode activated!"
+		status_message = "Rock Mode activated!"
 	#load background music in an array to skip through
 	BackGroundMusicArray = []
 	DrumsArray = []
@@ -85,6 +80,9 @@ def KidRock():
 	BackGroundMusicArrayCount = 0
 	pygame.mixer.music.load(BackGroundMusicArray[BackGroundMusicArrayCount])
 	pygame.mixer.music.set_volume(0.7)
+	pygame.mixer.music.play()
+	pygame.mixer.music.pause()
+	print(BackGroundMusicArray[BackGroundMusicArrayCount]+"loaded and paused")
 	#drum sounds are loaded
 	for filename_drums in sorted(os.listdir(filepath_drums)):
 		DrumsArray.append(filepath_music + filename_drums)
@@ -94,22 +92,26 @@ def KidRock():
 	openhh = pygame.mixer.Sound(DrumsArray[3])
 	tom1 = pygame.mixer.Sound(DrumsArray[4])
 	tom2 = pygame.mixer.Sound(DrumsArray[5])
-	LCD1602.clear()
-	LCD1602.write(0, 0, lcd_message)
+	print(DrumsArray[5] +"loaded")
 	showtitle = BackGroundMusicArray[0]
 	indexofslash = showtitle.rfind("/")+1
 	showtitle = showtitle[indexofslash:]
+	LCD1602.clear()
+	LCD1602.write(0, 0, lcd_message)
 	LCD1602.write(0, 1,showtitle)
-	tts.say(talkey_message)
+	print(showtitle)
+	print("KidRock done")
 
 def detect(chn):
 	pygame.mixer.music.stop()
+	print("music stopped")
 	KidRock()
 
 def nextSong():
 	global BackGroundMusicArrayCount
 	global BackGroundMusicArray
 	pygame.mixer.music.stop()
+	print("Music stopped")
 	if (BackGroundMusicArrayCount != len(BackGroundMusicArray)):
 		BackGroundMusicArrayCount = BackGroundMusicArrayCount+1
 		pygame.mixer.music.load(BackGroundMusicArray[BackGroundMusicArrayCount])
@@ -123,11 +125,15 @@ def nextSong():
 	indexofslash = showtitle.rfind("/")+1
 	showtitle = showtitle[indexofslash:]
 	LCD1602.write(0, 1,showtitle)
+	pygame.mixer.music.play()
+	pygame.mixer.music.pause()
+	print("Next song loaded and paused")
 
 def previousSong():
 	global BackGroundMusicArrayCount
 	global BackGroundMusicArray
 	pygame.mixer.music.stop()
+	print("Music stopped")
 	if (BackGroundMusicArrayCount != 0):
 		BackGroundMusicArrayCount = BackGroundMusicArrayCount-1
 		pygame.mixer.music.load(BackGroundMusicArray[BackGroundMusicArrayCount])
@@ -140,10 +146,12 @@ def previousSong():
 	showtitle = BackGroundMusicArray[BackGroundMusicArrayCount]
 	indexofslash = showtitle.rfind("/")+1
 	showtitle = showtitle[indexofslash:]
-	LCD1602.write(1, 0,showtitle)
+	LCD1602.write(0, 1,showtitle)
+	pygame.mixer.music.play()
+	pygame.mixer.music.pause()
+	print("Previous song loaded and paused")
 
 def run():
-	MusicPaused = 1
 	while True:
 		if (GPIO.input(6)): # Interupt pin is high
 			pass
@@ -152,7 +160,7 @@ def run():
 			for i in range(9):
 				if (touchData & (1<<i)):
 					if (touches[i] == 0):
-							#print( 'Pin ' + str(i) + ' was just touched')
+							print( 'Pin ' + str(i) + ' was just touched')
 						if (i == 0):
 							kick.play()
 						elif i == 1:
@@ -169,14 +177,12 @@ def run():
 							previousSong()
 						elif i == 7:
 							MusicPaused = PauseFunc()
-							if (MusicPaused == 0):
-								pygame.mixer.music.stop()
-								time.sleep(0.2)
-								pygame.mixer.music.play()
-							elif (MusicPaused == 1):
+							if (MusicPaused == 1):
 								pygame.mixer.music.pause()
-							elif (MusicPaused == 2):
+								print("Music paused")
+							elif (MusicPaused == 0):
 								pygame.mixer.music.unpause()
+								print("Music unpaused")
 						elif i == 8:
 							nextSong()
 					touches[i] = 1
@@ -189,7 +195,6 @@ def destroy():
 	GPIO.output(Gpin, GPIO.HIGH)       # Green led off
 	GPIO.output(Rpin, GPIO.HIGH)       # Red led off
 	GPIO.cleanup()                     # Release resource
-	tts.say("see you next time, buddy!")
 	LCD1602.clear()
 	LCD1602.write(0,0,"Good bye,")
 	LCD1602.write(0,1,"Niklas")
