@@ -7,7 +7,6 @@ import os
 import LCD1602
 from  itertools import cycle
 
-
 KidRockPin = 5
 Gpin   = 26
 Rpin   = 23
@@ -23,7 +22,6 @@ KidRockVar = 0
 IterFunc = cycle([0,1]).next
 PauseFunc = cycle([0,1]).next
 touches = [0,0,0,0,0,0,0,0,0,0,0,0];
-
 
 def setup():
 	# PIN Setup
@@ -103,8 +101,11 @@ def KidRock():
 	print("KidRock done")
 
 def detect(chn):
-	pygame.mixer.music.stop()
-	print("music stopped")
+	if (pygame.mixer.music.get_busy() == True):
+		pygame.mixer.music.stop()
+		print("music stopped")
+	else:
+		print("music not playing currently")
 	KidRock()
 
 def nextSong():
