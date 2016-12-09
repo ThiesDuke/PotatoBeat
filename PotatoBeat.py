@@ -30,17 +30,14 @@ def setup():
 	GPIO.setup(Rpin, GPIO.OUT)     # Set Red Led Pin mode to output
 	GPIO.setup(6, GPIO.IN)		# Set interrupt Pin to input
 	GPIO.setup(KidRockPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)    # Set BtnPin's mode is input, and pull up to high level(3.3V)
-	GPIO.add_event_detect(KidRockPin, GPIO.FALLING, callback=detect, bouncetime=300)
-	#Pygame setup
-	pygame.mixer.pre_init(44100, -16, 2, 512)
-	pygame.mixer.init()
-	pygame.mixer.music.set_volume(0.5)  
+	GPIO.add_event_detect(KidRockPin, GPIO.FALLING, callback=detect, bouncetime=300)  
 	# Initialize MPR121 here
 	mpr121.TOU_THRESH = 10
 	mpr121.REL_THRESH = 20
 	mpr121.setup(0x5a)
 	# Initialize LCD Display
 	LCD1602.init(0x27, 1)
+	time.sleep(0.1)
 	LCD1602.clear()
 	KidRock()
     
@@ -56,6 +53,13 @@ def KidRock():
 	global BackGroundMusicArray
 	print("KidRock started")
 	KidRockVar = IterFunc()
+	if (pygame.mixer.get_init()):
+		pygame.mixer.quit()
+		time.sleep(0.2)
+	pygame.mixer.pre_init(44100, -16, 2, 512)
+	pygame.mixer.init()
+	pygame.mixer.music.set_volume(0.5)
+	time.sleep(0.2)
 	if (KidRockVar == 0):
 		filepath_music = "/home/pi/share/beetbox/samples_music/kid/"
 		filepath_drums = "/home/pi/share/beetbox/samples_music/kid_drums/"
