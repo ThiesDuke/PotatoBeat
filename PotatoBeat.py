@@ -95,8 +95,11 @@ def KidRock():
 	indexofslash = showtitle.rfind("/")+1
 	showtitle = showtitle[indexofslash:]
 	LCD1602.init(0x27, 1)
+	time.sleep(0.1)
 	LCD1602.clear()
+	time.sleep(0.1)
 	LCD1602.write(0, 0, lcd_message)
+	time.sleep(0.1)
 	LCD1602.write(0, 1,showtitle)
 	print(showtitle)
 	print("KidRock done")
@@ -123,7 +126,9 @@ def nextSong():
 		pygame.mixer.music.load(BackGroundMusicArray[BackGroundMusicArrayCount])
 		#pygame.mixer.music.play(0)
 	LCD1602.init(0x27, 1)
+	time.sleep(0.1)
 	LCD1602.clear()
+	time.sleep(0.1)
 	showtitle = BackGroundMusicArray[BackGroundMusicArrayCount]
 	indexofslash = showtitle.rfind("/")+1
 	showtitle = showtitle[indexofslash:]
@@ -146,7 +151,9 @@ def previousSong():
 		pygame.mixer.music.load(BackGroundMusicArray[BackGroundMusicArrayCount])
 		#pygame.mixer.music.play(0)
 	LCD1602.init(0x27, 1)
+	time.sleep(0.1)
 	LCD1602.clear()
+	time.sleep(0.1)
 	showtitle = BackGroundMusicArray[BackGroundMusicArrayCount]
 	indexofslash = showtitle.rfind("/")+1
 	showtitle = showtitle[indexofslash:]
